@@ -12,7 +12,7 @@
 #include <sys/statvfs.h>
 #include <wiringPi.h>
 
-#define SECONDS_AFTER_LAST_MOVE	8
+#define FIRST_SLEEP_SECONDS	8
 #define MINIMUM_FREE_MBYTES	500
 
 #define REC_DIR			"/root/records"
@@ -118,8 +118,8 @@ void motion_handler(void)
 		printf("execv error : %s\n", strerror(errno));
 	}
 	else {
-		/* sleep a minimum time plus extra time for motions in the meantime */
-		sleep(SECONDS_AFTER_LAST_MOVE);
+		/* sleep a minimum time plus extra for motions in the meantime */
+		sleep(FIRST_SLEEP_SECONDS);
 
 		sleep_us = 0;
 		do {
@@ -151,6 +151,7 @@ int main(int argc, char **argv)
 	if ((rc = mkdir(REC_DIR, S_IRWXU|S_IRWXG|S_IRWXO)) != 0 && errno != EEXIST)
 		return rc;
 
+	/* this global variable will be used later to create relative timestamps */
 	gettimeofday(&start_tv, NULL);
 
 	wiringPiSetup();
